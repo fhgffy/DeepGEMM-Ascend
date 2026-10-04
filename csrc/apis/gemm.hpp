@@ -302,6 +302,9 @@ static void m_grouped_fp8_fp4_gemm_contiguous(
         expected_m_for_psum_layout.value_or(0u)
     );
     if (!maybe_desc.has_value()) return;
+    // The tail kernel leaves padded rows untouched.
+    if (ensure_zero_padding and not runtime->get_dry_run())
+        d.zero_();
     dispatch_fp8_fp4_gemm(maybe_desc.value());
 }
 
@@ -477,6 +480,9 @@ static void m_grouped_bf16_gemm_contiguous(
         expected_m_for_psum_layout
     );
     if (!maybe_desc.has_value()) return;
+    // The tail kernel leaves padded rows untouched.
+    if (ensure_zero_padding and not runtime->get_dry_run())
+        d.zero_();
     deep_gemm::launch_bf16_gemm(maybe_desc.value());
 }
 
